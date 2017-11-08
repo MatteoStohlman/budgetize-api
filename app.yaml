@@ -4,6 +4,8 @@ runtime: python27
 api_version: 1
 threadsafe: false
 handlers:
+- url: /test
+  script: hello.my_app
 - url: /.*
   script: getAccessToken.my_app
 
