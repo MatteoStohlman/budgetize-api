@@ -1,0 +1,17 @@
+import json
+from google.appengine.api import urlfetch
+
+def validateAccessToken(oktaAccessToken=False):
+	token="eyJhbGciOiJSUzI1NiIsImtpZCI6IjFyeFV6WV9hX20wT2lwSU8xNUZCLUNNWXRORHQ0WmhMdnhJTm54cUN0MG8ifQ.eyJ2ZXIiOjEsImp0aSI6IkFULlhORWltMXVta0d0U0pudlM4aXBGeXU1S2w3c1MyRDBWYXVSemNlOEZ0eVEiLCJpc3MiOiJodHRwczovL2Rldi00ODE2NjAub2t0YXByZXZpZXcuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTUxMDIwMTQwMSwiZXhwIjoxNTEwMjA1MDAxLCJjaWQiOiIwb2FjcWx1NmYyU05EWXdmMDBoNyIsInVpZCI6IjAwdWNxcWs4NGdQUzVYWjRrMGg3Iiwic2NwIjpbInByb2ZpbGUiLCJvcGVuaWQiLCJlbWFpbCJdLCJzdWIiOiJtYXR0ZW8rdGVzdEB0ZWNoNHRyYWRlcy5jb20ifQ.VX4tBYbS50PSG0bcuLM2oqflUSzoLySxNC0g911eA2y5QI7LFSMLGlFVoW_zuu_e2rvUTi8u6jnGx6o2vhmG8-qX91-rRJLcz0Tzx4mz3sx58WJ_cPsMn-tTzUq6vF-XKvXPtuEDUf23bNYqctSQRFECqxfTWm72AYZHBSYVAtiid38qXl3S1CdqGa8GlMIga6mdUyemcgdIq0vNI_BrSZSzFB8irEq0CS1RRlao-S8ecuNu9qIz1XDWhVdVs-iFojKm5SY48yD6I7BhVOcDJJxzuVhVjunGoTdY143-ph9M2K3Fw3sE2O0v1PbVpbCA0GzorDhqZg7kgJ6CBmzOng"
+	token_type_hint="access_token"
+	client_id="0oacqlu6f2SNDYwf00h7"
+	baseUrl="https://dev-481660.oktapreview.com/oauth2/default/v1/introspect"
+	tokenType_urlComponent="token_type_hint=access_token"
+	token_urlComponent="token="+token
+	clientId_urlComponent='client_id='+client_id
+	composedUrl = baseUrl+"?"+tokenType_urlComponent+"&"+token_urlComponent+'&'+clientId_urlComponent
+	result = urlfetch.fetch(
+		url=composedUrl,
+		method=urlfetch.POST,
+		headers={'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'})
+	return result.content
