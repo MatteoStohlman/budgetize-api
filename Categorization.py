@@ -1,3 +1,4 @@
+import webapp2
 # FILE PROCESSING
 '''
 import pandas as pd
@@ -6,11 +7,11 @@ f1 = 'bank.csv' #the file where my bank statement lives
 statement = pd.read_csv(f1,header=None) #read my bank statement file and call it "statement"
 bank = [] #create my blank array of expenses
 for index, description in enumerate(statement[0]): #for each row in my file (create an index)
-    expense = round(statement[1][index],0)
-    if statement[1][index] < 0:
-        bank.append([description, expense*-1])#append the description and the value to bank. * value by -1
-    else:
-        bank.append([description, expense]) #do same except * value by -1
+	expense = round(statement[1][index],0)
+	if statement[1][index] < 0:
+		bank.append([description, expense*-1])#append the description and the value to bank. * value by -1
+	else:
+		bank.append([description, expense]) #do same except * value by -1
 ###do stuff to make me able to use my categories list
 f2 = "Categories.csv" #the file where my list of categories lives
 catList = pd.read_csv(f2,header=None,keep_default_na=False) #read my list of categories and call it "catList"
@@ -18,20 +19,20 @@ mint = {} #create my blank associative array of categories and keywords
 
 #creates mint
 for column in catList:
-    key = catList[column][0]
-    values = catList[column]
-    mint[key] = values
+	key = catList[column][0]
+	values = catList[column]
+	mint[key] = values
 
 #removes the first value in dictionary (since that is the key in dictionary.) Also removes blank entries
 for category in mint:
-    del mint[category][0]
-    blankspaces = 0
-    for vendor in mint[category]:
-        if vendor == "":
-            blankspaces += 1
-    while blankspaces > 0:
-        del mint[category][len(mint[category])]
-        blankspaces -= 1
+	del mint[category][0]
+	blankspaces = 0
+	for vendor in mint[category]:
+		if vendor == "":
+			blankspaces += 1
+	while blankspaces > 0:
+		del mint[category][len(mint[category])]
+		blankspaces -= 1
 '''
 
 
@@ -39,11 +40,11 @@ for category in mint:
 # Categorization Function
 class categorize(webapp2.RequestHandler):
 	def get(self):
-    	self.response.headers["Content-Type"] = "text/plain"
-    	bank = self.bank()
-    	spending = self.categorize(bank)
-        self.response.write(spending)
-        self.response.write(self.perSpendCat(spending))
+		self.response.headers["Content-Type"] = "text/plain"
+		bank = self.bank()
+		spending = self.categorize(bank)
+		self.response.write(spending)
+		self.response.write(self.perSpendCat(spending))
 
 	def bank():
 		return([['Giant',25],['Safeway',50],['Matteogay',5]])
@@ -70,7 +71,7 @@ class categorize(webapp2.RequestHandler):
 							spending[cat]=value #then add the cat as a key and it's inital value as that first cost
 			if foundMatch == False: #if after all that I still haven't found a match for some things
 				spending['Unknown'] += value #add value to the unknown bucket
-	      return spending     
+		return spending
 		
 	def perSpendCat(spending):
 		return 'Total spend categorized:', round((1-(float(spending['Unknown']) / float(sum(spending.values()))))*100,1),"%"
