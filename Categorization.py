@@ -1,4 +1,5 @@
 import webapp2
+import logging
 # FILE PROCESSING
 '''
 import pandas as pd
@@ -38,23 +39,35 @@ for category in mint:
 
 
 # Categorization Function
-class categorize(webapp2.RequestHandler):
+class categorizer(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers["Content-Type"] = "text/plain"
 		bank = self.bank()
 		spending = self.categorize(bank)
+		self.response.write(bank)
 		self.response.write(spending)
-		self.response.write(self.perSpendCat(spending))
 
-	def bank():
+	#	self.response.write(self.perSpendCat(spending))
+
+	def bank(self):
+
 		return([['Giant',25],['Safeway',50],['Matteogay',5]])
 
-	def categoryMapping():
+	def categoryMapping(self):
+		catMap: {}
+		for entry in sqlstatement:
+			if entry[0] in catMap:
+				'add entry[1] to that catMap[entry[0]]'
+			else:
+				'add entry[0] as key in catMap'
+				'add entry[1] to that catMap[entry[0]]'
+
 		return({'Groceries':['Giant','Safeway']})
 
-	def categorize(bank):
+	def categorize(self,bank):
 		spending = {}
 		spending['Unknown'] = 0
+		mint = self.categoryMapping()
 		for expense in bank: ###for each bank entry ([item, cost])###
 			description = expense[0] #call the thing that I bought, "description"
 			value = expense[1] #call the ammount I paid for it, "value"
@@ -73,7 +86,7 @@ class categorize(webapp2.RequestHandler):
 				spending['Unknown'] += value #add value to the unknown bucket
 		return spending
 		
-	def perSpendCat(spending):
+	def perSpendCat(self,spending):
 		return 'Total spend categorized:', round((1-(float(spending['Unknown']) / float(sum(spending.values()))))*100,1),"%"
 
 
