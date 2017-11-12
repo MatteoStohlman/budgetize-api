@@ -35,23 +35,9 @@ def connect_to_cloudsql():
             host='127.0.0.1', user=CLOUDSQL_USER, passwd=CLOUDSQL_PASSWORD)
 
     return db
-def query(query):
+
+def rawQuery(query):
     db = connect_to_cloudsql()
     cursor = db.cursor()
     cursor.execute(query)
-
-class MainPage(webapp2.RequestHandler):
-    def get(self):
-        """Simple request handler that shows all of the MySQL variables."""
-        self.response.headers['Content-Type'] = 'text/plain'
-
-        db = connect_to_cloudsql()
-        cursor = db.cursor()
-        cursor.execute('SHOW VARIABLES')
-        for r in cursor.fetchall():
-            self.response.write('{}\n'.format(r))
-
-
-app = webapp2.WSGIApplication([
-    ('/', MainPage),
-], debug=True)
+    return cursor.fetchall()
