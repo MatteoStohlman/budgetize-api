@@ -1,6 +1,6 @@
 import os
 
-import MySQLdb
+#import MySQLdb
 import webapp2
 
 

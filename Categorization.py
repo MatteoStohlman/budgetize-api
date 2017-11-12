@@ -34,32 +34,45 @@ for category in mint:
         blankspaces -= 1
 '''
 
-bank = [['Giant',25],['Safeway',50],['Matteogay',5]]
-mint = {'Groceries':['Giant','Safeway']}
+
 
 # Categorization Function
-def categorize(bank):
-	spending = {}
-	spending['Unknown'] = 0
-	for expense in bank: ###for each bank entry ([item, cost])###
-		description = expense[0] #call the thing that I bought, "description"
-		value = expense[1] #call the ammount I paid for it, "value"
-		foundMatch = False #initalize whether i find a match in my loop to false
-		for cat in mint: ###while i'm at each bank entry, go through each cat in mint###
-			categoryName=cat #set cat to something cleaner
-			categoryVendors = mint[cat] #set the values of each corresponding key to something clear
-			for vendor in categoryVendors: ###while i'm at each bank entry and going through each cat in mint, loop through vendors
-				if "".join(vendor.lower().split()) in "".join(description.lower().split()): #if that vendor is somewhere in my description
-					foundMatch = True
-					if cat in spending: #and if that category is already in my spending array
-						spending[cat]+=value#add to that category in spending, the cost of the purchase
-					else: #if it's found in the description, but it's not in our list yet
-						spending[cat]=value #then add the cat as a key and it's inital value as that first cost
-		if foundMatch == False: #if after all that I still haven't found a match for some things
-			spending['Unknown'] += value #add value to the unknown bucket
-            
-	print 'Total spend categorized:', round((1-(float(spending['Unknown']) / float(sum(spending.values()))))*100,1),"%"
-	print(spending)
-	return spending 
-categorize(bank)
+class categorize(webapp2.RequestHandler):
+	def get(self):
+    	self.response.headers["Content-Type"] = "text/plain"
+    	bank = self.bank()
+    	spending = self.categorize(bank)
+        self.response.write(spending)
+        self.response.write(self.perSpendCat(spending))
+
+	def bank():
+		return([['Giant',25],['Safeway',50],['Matteogay',5]])
+
+	def categoryMapping():
+		return({'Groceries':['Giant','Safeway']})
+
+	def categorize(bank):
+		spending = {}
+		spending['Unknown'] = 0
+		for expense in bank: ###for each bank entry ([item, cost])###
+			description = expense[0] #call the thing that I bought, "description"
+			value = expense[1] #call the ammount I paid for it, "value"
+			foundMatch = False #initalize whether i find a match in my loop to false
+			for cat in mint: ###while i'm at each bank entry, go through each cat in mint###
+				categoryName=cat #set cat to something cleaner
+				categoryVendors = mint[cat] #set the values of each corresponding key to something clear
+				for vendor in categoryVendors: ###while i'm at each bank entry and going through each cat in mint, loop through vendors
+					if "".join(vendor.lower().split()) in "".join(description.lower().split()): #if that vendor is somewhere in my description
+						foundMatch = True
+						if cat in spending: #and if that category is already in my spending array
+							spending[cat]+=value#add to that category in spending, the cost of the purchase
+						else: #if it's found in the description, but it's not in our list yet
+							spending[cat]=value #then add the cat as a key and it's inital value as that first cost
+			if foundMatch == False: #if after all that I still haven't found a match for some things
+				spending['Unknown'] += value #add value to the unknown bucket
+	      return spending     
+		
+	def perSpendCat(spending):
+		return 'Total spend categorized:', round((1-(float(spending['Unknown']) / float(sum(spending.values()))))*100,1),"%"
+
 
