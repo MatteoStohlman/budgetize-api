@@ -8,6 +8,7 @@ appengine.monkeypatch()
 import ssl
 from google.appengine.api import urlfetch
 from oktaIntegration.validateAccessToken import validateAccessToken
+from database.rawQuery import rawQuery
 
 class AddBankAccount(webapp2.RequestHandler):
     PLAID_CLIENT_ID = "5929e9dd4e95b8036a672bde" #os.getenv('PLAID_CLIENT_ID')
@@ -21,8 +22,8 @@ class AddBankAccount(webapp2.RequestHandler):
         self.response.write("test")
 
     def post(self):
-        oktaAccessToken = request.headers['Authorization']
-        validationResult = validateAccessToken(oktaAccessToken)
+        # oktaAccessToken = request.headers['Authorization']
+        # validationResult = validateAccessToken(oktaAccessToken)
         jsonstring = self.request.body
         jsonobject = json.loads(jsonstring)
         jsonobject['client_id']=self.PLAID_CLIENT_ID
@@ -50,6 +51,8 @@ class AddBankAccount(webapp2.RequestHandler):
             accessTokenResponse = json.loads(result.content)
             accessToken = accessTokenResponse['access_token']
             logging.debug(accessToken)
+            query = "INSERT INTO table_name (column1, column2, column3, ...) VALUES (value1, value2, value3, ...);"
+            rawQuery("INSERT INTO")
             
         except:
             logging.exception('Caught Exception Fetching Transaction Data')
@@ -62,7 +65,7 @@ class AddBankAccount(webapp2.RequestHandler):
     def decorateHeaders(self):
         """Decorates headers for the current request."""
         self.response.headers.add_header('Access-Control-Allow-Origin', '*')
-        self.response.headers.add_header('Access-Control-Allow-Headers', 'Content-Type, Accept')
+        self.response.headers.add_header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
         self.response.headers.add_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE')
 
     def options(self):
