@@ -1,5 +1,6 @@
 import webapp2
 import logging
+from database.rawQuery import rawQuery
 # FILE PROCESSING
 '''
 import pandas as pd
@@ -54,12 +55,13 @@ class categorizer(webapp2.RequestHandler):
 		return([['Giant',25],['Safeway',50],['Matteogay',5]])
 
 	def categoryMapping(self):
-		catMap: {}
-		for entry in sqlstatement:
+		queryResult = rawQuery('SELECT name,expense_descriptions.description FROM \
+			budgetizer.budget_categories INNER JOIN budgetizer.expense_descriptions on \
+			budget_categories.id = expense_descriptions.budget_category_id;')		
+		catMap = {}
+		for entry in queryResult:
 			if entry[0] in catMap:
-				'add entry[1] to that catMap[entry[0]]'
-			else:
-				'add entry[0] as key in catMap'
+				catMap[entry[0]].append(entry[1])
 				'add entry[1] to that catMap[entry[0]]'
 
 		return({'Groceries':['Giant','Safeway']})

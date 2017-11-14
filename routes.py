@@ -7,7 +7,7 @@ import Categorization
 routes =[
 	('/getAccessToken', getAccessToken.MainPage),
 	('/tester', testDump.testOktaCall),
-	('/Categorization',Categorization.categorize)
+	('/Categorization',Categorization.categorizer)
 	]
 
 
