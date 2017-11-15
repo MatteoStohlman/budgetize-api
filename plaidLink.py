@@ -1,7 +1,7 @@
 import webapp2
 import dbConnectExample
 import logging
-from plaid import Client
+#from plaid import Client
 
 
 class MainPage(webapp2.RequestHandler):

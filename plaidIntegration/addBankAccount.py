@@ -1,10 +1,10 @@
 import webapp2
 import dbConnectExample
 import logging
-from plaid import Client
+#from plaid import Client
 import json
-from requests_toolbelt.adapters import appengine
-appengine.monkeypatch()
+#from requests_toolbelt.adapters import appengine
+#appengine.monkeypatch()
 import ssl
 from google.appengine.api import urlfetch
 from oktaIntegration.validateAccessToken import validateAccessToken
