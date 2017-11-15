@@ -4,7 +4,7 @@ import logging
 #from plaid import Client
 import json
 #from requests_toolbelt.adapters import appengine
-appengine.monkeypatch()
+#appengine.monkeypatch()
 import ssl
 from google.appengine.api import urlfetch
 from oktaIntegration.validateAccessToken import validateAccessToken
