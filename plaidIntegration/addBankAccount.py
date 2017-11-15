@@ -22,40 +22,45 @@ class AddBankAccount(webapp2.RequestHandler):
         self.response.write("test")
 
     def post(self):
-        # oktaAccessToken = request.headers['Authorization']
-        # validationResult = validateAccessToken(oktaAccessToken)
-        jsonstring = self.request.body
-        jsonobject = json.loads(jsonstring)
-        jsonobject['client_id']=self.PLAID_CLIENT_ID
-        jsonobject['secret']=self.PLAID_SECRET
-        public_token = jsonobject['public_token']
-        payload = json.dumps(jsonobject)
-        logging.debug(payload)
-        access_token='test'
-        institution = self.request.get("institution")
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.headers['Access-Control-Allow-Origin']='*'
-        try:
-            form_data = jsonobject
-            headers = {'Content-Type': 'application/json'}
-            result = urlfetch.fetch(
-                url='https://sandbox.plaid.com/item/public_token/exchange',
-                payload=payload,
-                method=urlfetch.POST,
-                headers=headers)
-            self.response.write(result.content)
-        except urlfetch.Error:
-            logging.exception('Caught exception fetching Access Token')
-        try:
-            newPayload = {};
-            accessTokenResponse = json.loads(result.content)
-            accessToken = accessTokenResponse['access_token']
-            logging.debug(accessToken)
-            query = "INSERT INTO table_name (column1, column2, column3, ...) VALUES (value1, value2, value3, ...);"
-            rawQuery("INSERT INTO")
+        oktaAccessToken = self.request.headers['Authorization']
+        validationResult = validateAccessToken(oktaAccessToken)
+        authUserEmail=json.loads(validationResult)['username']
+        query_getAuthUserId=""" SELECT access_token 
+                                FROM budgetizer.plaid_access_tokens tokensTb 
+                                JOIN budgetizer.users usersTb 
+                                ON userTb.id=tokensTb.user_id 
+                                WHERE user_id = %s"""
+        accessToken = rawQuery(query_getAuthUserId,authUserEmail)
+        print(accessToken)
+        # jsonstring = self.request.body
+        # jsonobject = json.loads(jsonstring)
+        # jsonobject['client_id']=self.PLAID_CLIENT_ID
+        # jsonobject['secret']=self.PLAID_SECRET
+        # public_token = jsonobject['public_token']
+        # payload = json.dumps(jsonobject)
+        # logging.debug(payload)
+        # access_token='test'
+        # institution = self.request.get("institution")
+        # self.response.headers["Content-Type"] = "application/json"
+        # self.response.headers['Access-Control-Allow-Origin']='*'
+        # try:
+        #     form_data = jsonobject
+        #     headers = {'Content-Type': 'application/json'}
+        #     result = urlfetch.fetch(
+        #         url='https://sandbox.plaid.com/item/public_token/exchange',
+        #         payload=payload,
+        #         method=urlfetch.POST,
+        #         headers=headers)
+        #     self.response.write(result.content)
+        #     newPayload = {};
+        #     accessTokenResponse = json.loads(result.content)
+        #     accessToken = accessTokenResponse['access_token']
+        #     logging.debug(accessToken)
+        #     query = """INSERT INTO budgetizer.plaid_access_tokens (access_token,user_id) VALUES (%s, %s);"""
+        #     rawQuery(query,(accessToken,1))
             
-        except:
-            logging.exception('Caught Exception Fetching Transaction Data')
+        # except:
+        #     logging.exception('Caught Exception Fetching f')
         # client = Client(client_id=self.PLAID_CLIENT_ID, secret=self.PLAID_SECRET, public_key=self.PLAID_PUBLIC_KEY, environment='sandbox')
         # response = client.Item.public_token.exchange(public_token)
         # access_token = response['access_token']

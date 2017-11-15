@@ -1,5 +1,5 @@
 import os
-
+import logging
 import MySQLdb
 import webapp2
 
@@ -36,8 +36,23 @@ def connect_to_cloudsql():
 
     return db
 
-def rawQuery(query):
+def rawQuery(query,values):
+    logging.debug("START: database.rawQuery")
+    logging.debug("PARAM:")
+    logging.debug(query)
+    logging.debug(values)
     db = connect_to_cloudsql()
     cursor = db.cursor()
-    cursor.execute(query)
-    return cursor.fetchall()
+    try:
+        cursor.execute(query,values)
+        returnValue=cursor.fetchall()
+        logging.debug("RESPONSE")
+        logging.debug(returnValue)
+        logging.debug('END: database.rawQuery')
+        db.commit()
+        return returnValue
+    except:
+        logging.exception('Failure in database.rawQuery')
+    finally:
+        logging.debug('Sucessful Query')
+        # cursor.close()
