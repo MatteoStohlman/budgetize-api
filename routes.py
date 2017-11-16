@@ -1,11 +1,13 @@
 import webapp2
 from plaidIntegration import addBankAccount
+from plaidIntegration.getTransactions import GetTransactions
 import testDump
 import Categorization
 
 
 routes =[
-	('/getAccessToken', addBankAccount.AddBankAccount),
+	('/addBankAccount', addBankAccount.AddBankAccount),
+	('/getTransactions',GetTransactions),
 	('/tester', testDump.testOktaCall),
 	('/Categorization',Categorization.categorizer)
 	]
