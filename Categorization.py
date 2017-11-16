@@ -6,10 +6,10 @@ class categorizer(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers["Content-Type"] = "text/plain"
 		bank = self.bank()
-		spending = self.categorize(bank)
 		catMap = self.categoryMapping()
-		self.response.write(bank)
-		self.response.write(spending)
+#		spending = self.categorize(bank)
+#		self.response.write(spending)
+#		self.response.write(queryResult)
 		self.response.write(catMap)
 
 	def bank(self):
@@ -18,13 +18,26 @@ class categorizer(webapp2.RequestHandler):
 	def categoryMapping(self):
 		queryResult = rawQuery('SELECT name,expense_descriptions.description FROM \
 			budgetizer.budget_categories INNER JOIN budgetizer.expense_descriptions on \
-			budget_categories.id = expense_descriptions.budget_category_id;')
+			budget_categories.id = expense_descriptions.budget_category_id;',None)
 		catMap = {}
 		for entry in queryResult:
 			if entry[0] in catMap:
-				catMap[entry[0]].append(entry[1])
+				catMap[entry[0]] = entry[1]
+			else:
+				catMap[entry[0]] = entry[1]
 		return(catMap)
 
+'''
+catList = pd.read_csv(f2,header=None,keep_default_na=False) #read my list of categories and call it "catList"
+mint = {} #create my blank associative array of categories and keywords
+
+#creates mint
+for column in catList:
+	key = catList[column][0]
+	values = catList[column]
+	mint[key] = values
+'''
+'''
 	def categorize(self,bank):
 		spending = {}
 		spending['Unknown'] = 0
@@ -50,7 +63,7 @@ class categorizer(webapp2.RequestHandler):
 	def perSpendCat(self,spending):
 		return 'Total spend categorized:', round((1-(float(self.spending['Unknown']) / float(sum(self.spending.values()))))*100,1),"%"
 
-
+'''
 '''
 OLD ORIGINAL STUFF
 import pandas as pd
