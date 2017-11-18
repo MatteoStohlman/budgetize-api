@@ -22,9 +22,9 @@ class categorizer(webapp2.RequestHandler):
 		catMap = {}
 		for entry in queryResult:
 			if entry[0] in catMap:
-				catMap[entry[0]] += (entry[1])
+				catMap[entry[0]].append(entry[1])
 			else:
-				catMap[entry[0]] = entry[1]
+				catMap[entry[0]] = [entry[1]]
 		return(catMap)
 
 '''
