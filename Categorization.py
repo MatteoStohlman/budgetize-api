@@ -16,15 +16,20 @@ class categorizer(webapp2.RequestHandler):
 		return([['Giant',25],['Safeway',50],['Matteogay',69]])
 
 	def categoryMapping(self):
-		queryResult = rawQuery('SELECT name,expense_descriptions.description FROM \
-			budgetizer.budget_categories INNER JOIN budgetizer.expense_descriptions on \
-			budget_categories.id = expense_descriptions.budget_category_id;',None)
+		queryResult = rawQuery("""	SELECT name,expense_descriptions.description 
+									FROM budgetizer.budget_categories 
+									INNER JOIN budgetizer.expense_descriptions 
+									ON budget_categories.id = expense_descriptions.budget_category_id;"""
+
+									,None
+								)
+		print(queryResult)
 		catMap = {}
 		for entry in queryResult:
 			if entry[0] in catMap:
-				catMap[entry[0]] += (entry[1])
+				catMap[entry[0]].append(entry[1])
 			else:
-				catMap[entry[0]] = entry[1]
+				catMap[entry[0]] = [entry[1]]
 		return(catMap)
 
 '''
