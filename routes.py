@@ -6,10 +6,10 @@ import Categorization
 
 
 routes =[
-	('/addBankAccount', addBankAccount.AddBankAccount),
-	('/getTransactions',GetTransactions),
-	('/tester', testDump.testOktaCall),
-	('/Categorization',Categorization.categorizer)
+		('/addBankAccount', addBankAccount.AddBankAccount),
+		('/getTransactions',GetTransactions),
+		('/tester', testDump.testOktaCall),
+		('/Categorization',Categorization.categorizer)
 	]
 
 
