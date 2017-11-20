@@ -1,16 +1,28 @@
 import webapp2
 import logging
+import json
 from database.rawQuery import rawQuery
+from plaidIntegration.getTransactions import GetTransactions
+import pprint
+from oktaIntegration.validateAccessToken import getLoggedUserId
 
 class categorizer(webapp2.RequestHandler):
 	def get(self):
-		self.response.headers["Content-Type"] = "text/plain"
-		bank = self.bank()
-		catMap = self.categoryMapping()
+		self.decorateHeaders()
+		self.response.headers["Content-Type"] = "application/json"
+		# bank = self.bank()
+		# catMap = self.categoryMapping()
+		oktaAccessToken = self.request.headers['Authorization']
+		userId = getLoggedUserId(oktaAccessToken)
+		if userId:
+			logging.debug(userId)
+			self.response.write(json.dumps(self.categorize(userId)))
+		else:
+			self.response.write(json.dumps({"status":False}))
 #		spending = self.categorize(bank)
 #		self.response.write(spending)
 #		self.response.write(queryResult)
-		self.response.write(catMap)
+		# self.response.write(catMap)
 
 	def bank(self):
 		return([['Giant',25],['Safeway',50],['Matteogay',69]])
@@ -23,7 +35,7 @@ class categorizer(webapp2.RequestHandler):
 
 									,None
 								)
-		print(queryResult)
+		# print(queryResult)
 		catMap = {}
 		for entry in queryResult:
 			if entry[0] in catMap:
@@ -31,6 +43,84 @@ class categorizer(webapp2.RequestHandler):
 			else:
 				catMap[entry[0]] = [entry[1]]
 		return(catMap)
+
+	def reverseCategoryMapping(self):
+		queryResult = rawQuery("""	SELECT name,expense_descriptions.description 
+									FROM budgetizer.budget_categories 
+									INNER JOIN budgetizer.expense_descriptions 
+									ON budget_categories.id = expense_descriptions.budget_category_id;"""
+
+									,None
+								)
+		reverseCatMap={}
+		for entry in queryResult:
+			# print(entry[1],entry[0])
+			reverseCatMap[entry[1]]=entry[0]
+
+
+		return reverseCatMap
+
+	def categorize(self,userId):
+		reverseCatMap=self.reverseCategoryMapping()
+		print(reverseCatMap)
+		transactionsResponse=GetTransactions().byUserId(userId)
+		transactions=transactionsResponse['transactions']
+		numberOfBanks=transactionsResponse['numberOfBanks']
+		categorized = {}
+		categorized['numberOfBanks']=numberOfBanks
+		categorized['summary']={}
+		categorized['summary']['Unknown']={'value':0}
+		categorized['Unknown']=0
+		categorized['total']=0
+		categorized['missingMatches']=[]
+		categorized['transactionCount']=len(transactions)
+		for transaction in transactions:
+			foundMatch=False
+			if transaction['category']:
+				for category in transaction['category']:
+					# print(category)
+					if category in reverseCatMap:
+						foundMatch=True
+						if category in categorized['summary']:
+							categorized['summary'][category]['value']+=transaction['amount']
+							categorized['summary'][category]['transactions'].append(transaction)
+						else:
+							categorized['summary'][category]={'value':transaction['amount'],'transactions':[]}
+						break
+				if foundMatch==False:
+					categorized['missingMatches']+=transaction['category']
+			if foundMatch==False:
+				categorized['Unknown']+=transaction['amount']
+				categorized['summary']['Unknown']['value']+=transaction['amount']
+				
+			categorized['total']+=transaction['amount']
+
+		# CHECKSUM
+		checksum=0
+		for category in categorized['summary']:
+			checksum+=categorized['summary'][category]['value']
+		categorized['checksum']=checksum
+
+		# DETERMINING UNKNOWN COUNTS
+		unknownCounts = {}
+		for categoryName in categorized['missingMatches']:
+			if categoryName in unknownCounts:
+				unknownCounts[categoryName]+=1
+			else:
+				unknownCounts[categoryName]=1
+		categorized['missingMatches']=unknownCounts
+
+		return categorized
+
+	def decorateHeaders(self):
+		"""Decorates headers for the current request."""
+		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+		self.response.headers.add_header('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
+		self.response.headers.add_header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE')
+
+	def options(self):
+		"""Default OPTIONS handler for the entire app."""
+		self.decorateHeaders()
 
 '''
 catList = pd.read_csv(f2,header=None,keep_default_na=False) #read my list of categories and call it "catList"
