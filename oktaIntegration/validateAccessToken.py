@@ -1,5 +1,6 @@
 import json
 from google.appengine.api import urlfetch
+from database.rawQuery import rawQuery
 
 def validateAccessToken(oktaAccessToken=False):
 	if(oktaAccessToken):
@@ -18,3 +19,18 @@ def validateAccessToken(oktaAccessToken=False):
 		return result.content
 	else:
 		return {'status':False}
+def getLoggedUserId(oktaAccessToken=False):
+	validationResult = validateAccessToken(oktaAccessToken)
+	if(json.loads(validationResult)['active']):
+		authUserEmail=json.loads(validationResult)['username']
+		query_getAuthUserId=""" SELECT id 
+		                        FROM budgetizer.users
+		                        WHERE email = %s"""
+		resp_getAuthUserId = rawQuery(query_getAuthUserId,(authUserEmail,))
+		if(len(resp_getAuthUserId)):
+		    userId=resp_getAuthUserId[0][0]
+		    return userId
+		else:
+			return False
+	else:
+		return False

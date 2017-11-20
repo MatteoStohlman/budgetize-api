@@ -37,10 +37,10 @@ def connect_to_cloudsql():
     return db
 
 def rawQuery(query,values):
-    logging.debug("START: database.rawQuery")
-    logging.debug("PARAM:")
-    logging.debug(query)
-    logging.debug(values)
+    # logging.debug("START: database.rawQuery")
+    # logging.debug("PARAM:")
+    # logging.debug(query)
+    # logging.debug(values)
     db = connect_to_cloudsql()
     cursor = db.cursor()
     try:
